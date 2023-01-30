@@ -97,4 +97,9 @@ renoise.tool():add_menu_entry {
   end
 }
 
-
+renoise.tool():add_menu_entry {
+  name = "Main Menu:Tools:Copy all used Samples from Pattern to a new Instrument",
+  invoke = function()
+    copy_sample_mappings_to_new_instrument(used_sample_mappings(renoise.song().pattern_iterator:note_columns_in_pattern(renoise.song().selected_pattern_index)))
+  end
+}
