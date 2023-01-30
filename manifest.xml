@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>6.1</ApiVersion>
+  <Id>org.tris.CollectSamples</Id>
+  <Version>1</Version>
+  <Author>Tristan Strange | tristan.strange@gmail.com  </Author>
+  <Name>Collect Samples</Name>
+  <Category>Sample Management</Category>
+  <Description>Collect all samples used in a Renoise Song into a single instrument.</Description>
+  <Homepage>http://tools.renoise.com</Homepage>
+</RenoiseScriptingTool>
