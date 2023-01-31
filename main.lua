@@ -137,7 +137,8 @@ local function copy_song_samples_to_new_instrument()
   local rs = renoise.song()
   local it = rs.pattern_iterator:note_columns_in_song()
   local sms = used_sample_mappings(it)
-  local dest = rs:insert_instrument_at(#rs.instruments+1)
+  local dest = rs:insert_instrument_at(1)
+  dest.name = rs.name .. " song source samples"
   copy_sample_mappings_to_instrument(sms, dest)
 end
 
@@ -146,7 +147,8 @@ local function copy_pattern_samples_to_new_instrument()
   local rs = renoise.song()
   local it = rs.pattern_iterator:note_columns_in_pattern(rs.selected_pattern_index)
   local sms = used_sample_mappings(it)
-  local dest = rs:insert_instrument_at(#rs.instruments+1)
+  local dest = rs:insert_instrument_at(1)
+  dest.name = rs.selected_pattern.name .. " pattern source samples"
   copy_sample_mappings_to_instrument(sms, dest)
 end
 
@@ -155,7 +157,8 @@ local function copy_track_samples_to_new_instrument()
   local rs = renoise.song()
   local it = rs.pattern_iterator:note_columns_in_track(rs.selected_track_index)
   local sms = used_sample_mappings(it)
-  local dest = rs:insert_instrument_at(#rs.instruments+1)
+  local dest = rs:insert_instrument_at(1)
+  dest.name = rs.selected_track.name .. " track source samples"
   copy_sample_mappings_to_instrument(sms, dest)
 end
 
