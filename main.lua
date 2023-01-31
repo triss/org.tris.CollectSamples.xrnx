@@ -9,7 +9,7 @@ _AUTO_RELOAD_DEBUG = true
 --------------------------------------------------------------------------------
 
 local options = renoise.Document.create("ScriptingToolPreferences") {
-  start_mapping_from = 36
+  start_mapping_from = 36,
 }
 
 renoise.tool().preferences = options
@@ -62,14 +62,13 @@ local function used_sample_mappings(note_column_it)
   return mappings
 end
 
--- copies every sample referenced in sample_mappings and adds them to a new 
--- instrument.
+-- copies every sample referenced in sample_mappings and adds them to the
+-- destination instrument.
 -- Every sample gets it's own note.
 -- If a sample was layered with another in the source instrument it is also 
 -- layered with it in the destination.
-local function copy_sample_mappings_to_new_instrument(sample_mappings)
+local function copy_sample_mappings_to_instrument(sample_mappings, dest)
   local rs = renoise.song()
-  local dest = rs:insert_instrument_at(#rs.instruments+1)
   local note_to_map = options.start_mapping_from.value
 
   for _,instrument_mapping in pairs(sample_mappings) do 
@@ -86,27 +85,67 @@ local function copy_sample_mappings_to_new_instrument(sample_mappings)
   end
 end
 
+-- copies every used sample in the song to a newly created instrument
+local function copy_song_samples_to_new_instrument()
+  local rs = renoise.song()
+  local it = rs.pattern_iterator:note_columns_in_song()
+  local sms = used_sample_mappings(it)
+  local dest = rs:insert_instrument_at(#rs.instruments+1)
+  copy_sample_mappings_to_instrument(sms, dest)
+end
+
+-- copies every used sample in the selected pattern to a newly created instrument
+local function copy_pattern_samples_to_new_instrument()
+  local rs = renoise.song()
+  local it = rs.pattern_iterator:note_columns_in_pattern(renoise.song().selected_pattern_index)
+  local sms = used_sample_mappings(it)
+  local dest = rs:insert_instrument_at(#rs.instruments+1)
+  copy_sample_mappings_to_instrument(sms, dest)
+end
+
+-- copies every used sample in the selected track to a newly created instrument
+local function copy_track_samples_to_new_instrument()
+  local rs = renoise.song()
+  local it = rs.pattern_iterator:note_columns_in_track(renoise.song().selected_track_index)
+  local sms = used_sample_mappings(it)
+  local dest = rs:insert_instrument_at(#rs.instruments+1)
+  copy_sample_mappings_to_instrument(sms, dest)
+end
+
 --------------------------------------------------------------------------------
 -- Menu entries
 --------------------------------------------------------------------------------
 
 renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Copy all used Samples to a new Instrument",
-  invoke = function()
-    copy_sample_mappings_to_new_instrument(used_sample_mappings(renoise.song().pattern_iterator:note_columns_in_song()))
-  end
+  name = "Main Menu:Tools:Copy all used Samples:from Song to a new Instrument",
+  invoke = copy_song_samples_to_new_instrument
 }
 
 renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Copy all used Samples from Pattern to a new Instrument",
-  invoke = function()
-    copy_sample_mappings_to_new_instrument(used_sample_mappings(renoise.song().pattern_iterator:note_columns_in_pattern(renoise.song().selected_pattern_index)))
-  end
+  name = "Main Menu:Tools:Copy all used Samples:from Pattern to a new Instrument",
+  invoke = copy_pattern_samples_to_new_instrument
 }
 
 renoise.tool():add_menu_entry {
-  name = "Main Menu:Tools:Copy all used Samples from Track to a new Instrument",
-  invoke = function()
-    copy_sample_mappings_to_new_instrument(used_sample_mappings(renoise.song().pattern_iterator:note_columns_in_track(renoise.song().selected_track_index)))
-  end
+  name = "Main Menu:Tools:Copy all used Samples:from Track to a new Instrument",
+  invoke = copy_track_samples_to_new_instrument
+}
+
+--------------------------------------------------------------------------------
+-- Keyboard shortcuts
+--------------------------------------------------------------------------------
+
+renoise.tool():add_keybinding {
+  name = "Global:Copy all used Samples:from Song to a new Instrument",
+  invoke = copy_song_samples_to_new_instrument
+}
+
+renoise.tool():add_keybinding {
+  name = "Global:Copy all used Samples:from Pattern to a new Instrument",
+  invoke = copy_pattern_samples_to_new_instrument
+}
+
+renoise.tool():add_keybinding {
+  name = "Global:Copy all used Samples:from Track to a new Instrument",
+  invoke = copy_track_samples_to_new_instrument
 }
