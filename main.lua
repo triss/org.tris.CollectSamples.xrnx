@@ -8,7 +8,7 @@ _AUTO_RELOAD_DEBUG = true
 --  Preferences
 --------------------------------------------------------------------------------
 
-local SLICED_FILE_MODE = {ask=1, copy_src=2, skip=3}
+local SLICED_FILE_MODE = {copy_src=1, skip=2}
 
 local options = renoise.Document.create("ScriptingToolPreferences") {
   start_mapping_from = 36,
@@ -27,7 +27,7 @@ local function between(n, range)
 end
 
 --------------------------------------------------------------------------------
--- Main functions
+-- Sample mapping analysis
 --------------------------------------------------------------------------------
 
 -- we keep track of sliced instruments as we see them as we only want to copy
@@ -78,6 +78,10 @@ local function used_sample_mappings(note_column_it)
 
   return mappings
 end
+
+--------------------------------------------------------------------------------
+-- Sample copying
+--------------------------------------------------------------------------------
 
 -- only used when we have to deal with sliced samples
 -- assume's sliced sample is the first in the instrument? (it always is?)
@@ -163,6 +167,30 @@ local function copy_track_samples_to_new_instrument()
 end
 
 --------------------------------------------------------------------------------
+-- Options dialog
+--------------------------------------------------------------------------------
+
+local function show_options()
+  local vb = renoise.ViewBuilder()
+
+  local v = vb:column {
+    vb:row {
+      vb:text { text = "Sliced instrument handling:" },
+      vb:popup {
+        id = "sliced_file_handling",
+        items = {"Copy source sample", "Skip sample"},
+        value = options.sliced_file_mode.value,
+        notifier = function()
+          options.sliced_file_mode.value = vb.views["sliced_file_handling"].value
+        end,
+        width = 130
+      }
+    }
+  }
+  renoise.app():show_custom_dialog("Copy used sample options", v)
+end
+
+--------------------------------------------------------------------------------
 -- Menu entries
 --------------------------------------------------------------------------------
 
@@ -179,6 +207,11 @@ renoise.tool():add_menu_entry {
 renoise.tool():add_menu_entry {
   name = "Main Menu:Tools:Copy all used Samples:from Track to a new Instrument",
   invoke = copy_track_samples_to_new_instrument
+}
+
+renoise.tool():add_menu_entry {
+  name = "Main Menu:Tools:Copy all used Samples:Options",
+  invoke = show_options
 }
 
 --------------------------------------------------------------------------------
@@ -198,4 +231,9 @@ renoise.tool():add_keybinding {
 renoise.tool():add_keybinding {
   name = "Global:Copy all used Samples:from Track to a new Instrument",
   invoke = copy_track_samples_to_new_instrument
+}
+
+renoise.tool():add_keybinding {
+  name = "Global:Copy all used Samples:Options",
+  invoke = show_options
 }
