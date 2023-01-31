@@ -185,6 +185,17 @@ local function show_options()
         end,
         width = 130
       }
+    },
+    vb:row {
+      vb:text { text = "First note in instrument: " },
+      vb:valuebox {
+        id = "first_note",
+        min = 0, max = 120, steps = {1, 12},
+        value = options.start_mapping_from.value,
+        notifier = function()
+          options.start_mapping_from.value = vb.views["first_note"].value
+        end
+      }
     }
   }
   renoise.app():show_custom_dialog("Copy used sample options", v)
